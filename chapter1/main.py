@@ -38,16 +38,21 @@ def total_volume_credits():
     return result
 
 
-def statement(invoice):
-    total_amount = 0
+def total_amount():
+    result = 0
+    for perf in invoice.performances:
+        result += amount_for(perf)
+    return result
+
+
+def statement():
     result = f"청구 내역 (고객명: {invoice.customer})\n"
 
     for perf in invoice.performances:
         # 청구 내역을 출력한다.
         result += f' {play_for(perf).name}: {locale.currency(amount_for(perf) / 100, grouping=True)} ({perf.audience}석)\n'
-        total_amount += amount_for(perf)
 
-    result += f"총액: {locale.currency(total_amount / 100, grouping=True)}\n"
+    result += f"총액: {locale.currency(total_amount() / 100, grouping=True)}\n"
     result += f"적립 포인트': {total_volume_credits()}점\n"
 
     return result
@@ -62,4 +67,4 @@ if __name__ == '__main__':
     with open('plays.json') as json_file:
         plays = DottedDict(json.load(json_file))
 
-    print(statement(invoice))
+    print(statement())
