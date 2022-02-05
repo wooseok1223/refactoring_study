@@ -46,12 +46,13 @@ def total_amount():
 
 
 def statement():
-    statement_data = {}
+    statement_data = DottedDict()
+    statement_data.customer = invoice.customer
     return render_plain_text(statement_data)
 
 
 def render_plain_text(data):
-    result = f"청구 내역 (고객명: {invoice.customer})\n"
+    result = f"청구 내역 (고객명: {data.customer})\n"
 
     for perf in invoice.performances:
         # 청구 내역을 출력한다.
