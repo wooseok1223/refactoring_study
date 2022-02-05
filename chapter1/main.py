@@ -28,7 +28,6 @@ def statement(invoice):
     result = f"청구 내역 (고객명: {invoice.customer})\n"
 
     for perf in invoice.performances:
-        this_amount = amount_for(perf)
 
         # 포인트를 적립한다.
         volume_credits += max(perf.audience - 30, 0)
@@ -38,8 +37,8 @@ def statement(invoice):
             volume_credits += math.floor(perf.audience / 5)
 
         # 청구 내역을 출력한다.
-        result += f' {play_for(perf).name}: {locale.currency(this_amount / 100, grouping=True)} ({perf.audience}석)\n'
-        total_amount += this_amount
+        result += f' {play_for(perf).name}: {locale.currency(amount_for(perf) / 100, grouping=True)} ({perf.audience}석)\n'
+        total_amount += amount_for(perf)
 
     result += f"총액: {locale.currency(total_amount / 100, grouping=True)}\n"
     result += f"적립 포인트': {volume_credits}점\n"
