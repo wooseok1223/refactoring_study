@@ -19,12 +19,16 @@ def amount_for(an_performance, play):
     return result
 
 
-def statement(invoice, plays):
+def play_for(an_performance):
+    return plays[an_performance.playID]
+
+
+def statement(invoice):
     total_amount, volume_credits = 0, 0
     result = f"청구 내역 (고객명: {invoice.customer})\n"
 
     for perf in invoice.performances:
-        play = plays[perf.playID]
+        play = play_for(perf)
         this_amount = amount_for(perf, play)
 
         # 포인트를 적립한다.
@@ -53,4 +57,4 @@ if __name__ == '__main__':
     with open('plays.json') as json_file:
         plays = DottedDict(json.load(json_file))
 
-    print(statement(invoice, plays))
+    print(statement(invoice))
