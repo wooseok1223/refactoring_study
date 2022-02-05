@@ -8,12 +8,12 @@ def play_for(an_performance):
     return plays[an_performance.playID]
 
 
-def amount_for(an_performance, play):
-    if play.type == "tragedy":  # 비극
+def amount_for(an_performance):
+    if play_for(an_performance).type == "tragedy":  # 비극
         result = 40000
         if an_performance.audience > 30:
             result += 1000 * (an_performance.audience - 30)
-    elif play.type == "comedy":  # 비극
+    elif play_for(an_performance).type == "comedy":  # 비극
         result = 30000
         if an_performance.audience > 20:
             result += 10000 + 500 * (an_performance.audience - 20)
@@ -28,7 +28,7 @@ def statement(invoice):
     result = f"청구 내역 (고객명: {invoice.customer})\n"
 
     for perf in invoice.performances:
-        this_amount = amount_for(perf, play_for(perf))
+        this_amount = amount_for(perf)
 
         # 포인트를 적립한다.
         volume_credits += max(perf.audience - 30, 0)
