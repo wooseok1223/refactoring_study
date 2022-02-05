@@ -46,10 +46,11 @@ def total_amount():
 
 
 def statement():
-    return render_plain_text()
+    statement_data = {}
+    return render_plain_text(statement_data)
 
 
-def render_plain_text():
+def render_plain_text(data):
     result = f"청구 내역 (고객명: {invoice.customer})\n"
 
     for perf in invoice.performances:
