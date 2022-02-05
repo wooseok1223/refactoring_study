@@ -4,6 +4,10 @@ from dotted.collection import DottedDict
 import locale
 
 
+def play_for(an_performance):
+    return plays[an_performance.playID]
+
+
 def amount_for(an_performance, play):
     if play.type == "tragedy":  # 비극
         result = 40000
@@ -19,27 +23,22 @@ def amount_for(an_performance, play):
     return result
 
 
-def play_for(an_performance):
-    return plays[an_performance.playID]
-
-
 def statement(invoice):
     total_amount, volume_credits = 0, 0
     result = f"청구 내역 (고객명: {invoice.customer})\n"
 
     for perf in invoice.performances:
-        play = play_for(perf)
-        this_amount = amount_for(perf, play)
+        this_amount = amount_for(perf, play_for(perf))
 
         # 포인트를 적립한다.
         volume_credits += max(perf.audience - 30, 0)
 
         # 희극 관객 5명마다 추가 포인트 제공
-        if play.type == "comedy":
+        if play_for(perf).type == "comedy":
             volume_credits += math.floor(perf.audience / 5)
 
         # 청구 내역을 출력한다.
-        result += f' {play.name}: {locale.currency(this_amount / 100, grouping=True)} ({perf.audience}석)\n'
+        result += f' {play_for(perf).name}: {locale.currency(this_amount / 100, grouping=True)} ({perf.audience}석)\n'
         total_amount += this_amount
 
     result += f"총액: {locale.currency(total_amount / 100, grouping=True)}\n"
