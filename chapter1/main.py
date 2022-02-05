@@ -4,24 +4,28 @@ from dotted.collection import DottedDict
 import locale
 
 
+def amount_for(an_performance, play):
+    if play.type == "tragedy":  # 비극
+        result = 40000
+        if an_performance.audience > 30:
+            result += 1000 * (an_performance.audience - 30)
+    elif play.type == "comedy":  # 비극
+        result = 30000
+        if an_performance.audience > 20:
+            result += 10000 + 500 * (an_performance.audience - 20)
+        result += 300 * an_performance.audience
+    else:
+        raise Exception("알 수 없는 장르")
+    return result
+
+
 def statement(invoice, plays):
     total_amount, volume_credits = 0, 0
     result = f"청구 내역 (고객명: {invoice.customer})\n"
 
     for perf in invoice.performances:
         play = plays[perf.playID]
-
-        if play.type == "tragedy":  # 비극
-            this_amount = 40000
-            if perf.audience > 30:
-                this_amount += 1000 * (perf.audience - 30)
-        elif play.type == "comedy":  # 비극
-            this_amount = 30000
-            if perf.audience > 20:
-                this_amount += 10000 + 500 * (perf.audience - 20)
-            this_amount += 300 * perf.audience
-        else:
-            raise Exception("알 수 없는 장르")
+        this_amount = amount_for(perf, play)
 
         # 포인트를 적립한다.
         volume_credits += max(perf.audience - 30, 0)
