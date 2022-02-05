@@ -24,11 +24,11 @@ def amount_for(an_performance):
 
 
 def volume_credits_for(perf):
-    volume_credits = 0
-    volume_credits += max(perf.audience - 30, 0)
+    result = 0
+    result += max(perf.audience - 30, 0)
     if play_for(perf).type == "comedy":
-        volume_credits += math.floor(perf.audience / 5)
-    return volume_credits
+        result += math.floor(perf.audience / 5)
+    return result
 
 
 def statement(invoice):
