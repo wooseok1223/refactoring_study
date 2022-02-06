@@ -1,5 +1,7 @@
 import json
 import math
+from functools import reduce
+
 from dotted.collection import DottedDict
 import locale
 
@@ -45,16 +47,10 @@ def statement():
         return result
 
     def total_volume_credits(data):
-        result = 0
-        for perf in data.performances:
-            result += perf.volume_credits
-        return result
+        return reduce(lambda total, p: total + p.volume_credits, data.performances, 0)
 
     def total_amount(data):
-        result = 0
-        for perf in data.performances:
-            result += amount_for(perf)
-        return result
+        return reduce(lambda total, p: total + p.amount, data.performances, 0)
 
     def enrich_performance(an_performance):
         result = an_performance
