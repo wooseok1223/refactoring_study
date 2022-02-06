@@ -22,6 +22,24 @@ def render_plain_text(data):
     return result
 
 
+def render_html(data):
+    result = f"<h1>청구 내역 (고객명: ${data.customer})</h1>\n'"
+    result += "<table>\n"
+    result += "<tr><th>연극</th><th>좌석 수</th><th>금액</th></tr>"
+    for perf in data.performances:
+        result += f"<tr><td>${perf.play.name}</td><td>(${perf.audience}석)</td>"
+        result += f"<td>${locale.currency(perf.amount, grouping=True)} </td></tr>\n"
+    result += "</table>\n"
+    result += f"<p>총액: <em>${locale.currency(data.total_amount, grouping=True)}</em></p>\n"
+    result += f"<p>적립 포인트: <em>${data.total_volume_credits}점</em></p>\n"
+
+    return result
+
+
+def html_statement():
+    return render_html(create_statement_data(invoice, plays))
+
+
 def statement():
     return render_plain_text(create_statement_data(invoice, plays))
 
@@ -36,3 +54,4 @@ if __name__ == '__main__':
         plays = DottedDict(json.load(json_file))
 
     print(statement())
+    print(html_statement())
