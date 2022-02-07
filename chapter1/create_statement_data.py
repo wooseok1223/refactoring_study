@@ -3,32 +3,57 @@ from functools import reduce
 from dotted.collection import DottedDict
 
 
+class PerformanceCalculator:
+    def __init__(self, an_performance, an_play):
+        self.performance = an_performance
+        self.play = an_play
+
+    def get_amount(self):
+        raise Exception("서브 클래스에서 처리하도록 설계되었습니다.")
+
+    def get_volume_credits(self):
+        return max(self.performance.audience - 30, 0)
+
+
+class TragedyCalculator(PerformanceCalculator):
+    def __init__(self, an_performance, an_play):
+        super().__init__(an_performance, an_play)
+
+    def get_amount(self):
+        result = 40000
+        if self.performance.audience > 30:
+            result += 1000 * (self.performance.audience - 30)
+        return result
+
+
+class ComedyCalculator(PerformanceCalculator):
+    def __init__(self, an_performance, an_play):
+        super().__init__(an_performance, an_play)
+
+    def get_amount(self):
+        result = 30000
+        if self.performance.audience > 20:
+            result += 10000 + 500 * (self.performance.audience - 20)
+        result += 300 * self.performance.audience
+        return result
+
+    def get_volume_credits(self):
+        return super().get_volume_credits() + math.floor(self.performance.audience / 5)
+
+
+def create_performance_calculator(an_performance, an_play):
+    if an_play.type == "tragedy":
+        return TragedyCalculator(an_performance, an_play)
+    elif an_play.type == "comedy":
+        return ComedyCalculator(an_performance, an_play)
+    return PerformanceCalculator(an_performance, an_play)
+
+
 def create_statement_data(invoice, plays):
     statement_data = DottedDict()
 
     def play_for(an_performance):
         return plays[an_performance.playID]
-
-    def amount_for(an_performance):
-        if an_performance.play.type == "tragedy":  # 비극
-            result = 40000
-            if an_performance.audience > 30:
-                result += 1000 * (an_performance.audience - 30)
-        elif an_performance.play.type == "comedy":  # 비극
-            result = 30000
-            if an_performance.audience > 20:
-                result += 10000 + 500 * (an_performance.audience - 20)
-            result += 300 * an_performance.audience
-        else:
-            raise Exception("알 수 없는 장르")
-        return result
-
-    def volume_credits_for(perf):
-        result = 0
-        result += max(perf.audience - 30, 0)
-        if perf.play.type == "comedy":
-            result += math.floor(perf.audience / 5)
-        return result
 
     def total_volume_credits(data):
         return reduce(lambda total, p: total + p.volume_credits, data.performances, 0)
@@ -37,10 +62,11 @@ def create_statement_data(invoice, plays):
         return reduce(lambda total, p: total + p.amount, data.performances, 0)
 
     def enrich_performance(an_performance):
+        calculator = create_performance_calculator(an_performance, play_for(an_performance))
         result = an_performance
         result.play = play_for(result)
-        result.amount = amount_for(result)
-        result.volume_credits = volume_credits_for(result)
+        result.amount = calculator.get_amount()
+        result.volume_credits = calculator.get_volume_credits()
 
         return result
 
